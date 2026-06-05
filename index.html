@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>OrderPro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Inter',sans-serif;}
+:root{
+  --bg:#09090b;
+  --surface:#111113;
+  --card:#18181b;
+  --card2:#1e1e21;
+  --border:#27272a;
+  --border2:#3f3f46;
+  --p:#8b5cf6;
+  --p2:#7c3aed;
+  --pg:linear-gradient(135deg,#8b5cf6,#ec4899);
+  --green:#10b981;
+  --yellow:#f59e0b;
+  --red:#ef4444;
+  --blue:#3b82f6;
+  --t1:#fafafa;
+  --t2:#a1a1aa;
+  --t3:#52525b;
+  --nav:68px;
+  --r:16px;
+}
+html{height:100%;background:var(--bg);}
+body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);}
+
+/* SCREENS */
+.S{position:fixed;top:0;left:0;right:0;bottom:0;display:none;flex-direction:column;}
+.S.show{display:flex;}
+
+/* ===== LOGIN ===== */
+#sLogin{
+  background:var(--bg);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  align-items:center;
+  justify-content:center;
+  padding:32px 24px;
+}
+.login-inner{width:100%;max-width:360px;}
+.brand{text-align:center;margin-bottom:40px;}
+.brand-logo{
+  width:64px;height:64px;
+  background:var(--pg);
+  border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;
+  margin:0 auto 16px;
+  box-shadow:0 8px 32px rgba(139,92,246,.4);
+}
+.brand-name{font-size:26px;font-weight:900;letter-spacing:-1px;}
+.brand-name em{background:var(--pg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:normal;}
+.brand-tag{font-size:13px;color:var(--t3);margin-top:4px;}
+
+.user-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+.ubtn{
+  background:var(--card);
+  border:2px solid var(--border);
+  border-radius:var(--r);
+  padding:20px 12px;
+  text-align:center;
+  cursor:pointer;
+  transition:border-color .2s,background .2s;
+  -webkit-user-select:none;
+  user-select:none;
+  touch-action:manipulation;
+}
+.ubtn.active{border-color:var(--p);background:rgba(139,92,246,.1);}
+.ubtn-emoji{font-size:32px;margin-bottom:8px;}
+.ubtn-name{font-size:14px;font-weight:700;}
+.ubtn-role{font-size:11px;color:var(--t3);margin-top:2px;}
+
+.pin-label{text-align:center;font-size:13px;color:var(--t2);font-weight:500;margin-bottom:16px;}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:28px;}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--border2);transition:all .2s;}
+.dot.fill{background:var(--p);box-shadow:0 0 10px rgba(139,92,246,.6);}
+
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.key{
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:14px;
+  padding:18px 10px;
+  font-size:22px;
+  font-weight:700;
+  color:var(--t1);
+  cursor:pointer;
+  touch-action:manipulation;
+  -webkit-user-select:none;
+  user-select:none;
+  transition:background .15s,transform .1s;
+  text-align:center;
+}
+.key:active{background:var(--p);transform:scale(.94);}
+.key.sm{font-size:13px;font-weight:700;}
+.pin-err{text-align:center;color:var(--red);font-size:12px;font-weight:600;margin-top:14px;min-height:18px;}
+
+/* ===== APP (AYUSH) ===== */
+#sApp{background:var(--bg);}
+.topbar{
+  padding:16px 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+  background:var(--bg);
+}
+.tb-left{}
+.tb-greet{font-size:12px;color:var(--t3);font-weight:600;letter-spacing:.3px;}
+.tb-title{font-size:22px;font-weight:900;letter-spacing:-0.5px;}
+.tb-right{display:flex;gap:8px;}
+.ib{
+  width:38px;height:38px;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:17px;color:var(--t2);
+  touch-action:manipulation;
+  transition:all .2s;
+}
+.ib:active{background:rgba(139,92,246,.15);color:var(--p);}
+.syncing{animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px;padding-bottom:calc(var(--nav) + 20px);}
+
+/* TABS */
+.tab-content{display:none;}
+.tab-content.show{display:block;}
+#tAI.show{display:flex;flex-direction:column;}
+
+/* BOTTOM NAV */
+.bnav{
+  height:var(--nav);
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-around;
+  padding:0 8px;
+  flex-shrink:0;
+}
+.ni{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:8px 14px;cursor:pointer;color:var(--t3);
+  touch-action:manipulation;transition:color .2s;
+}
+.ni.on{color:var(--p);}
+.ni svg{width:22px;height:22px;stroke-width:1.8;}
+.ni span{font-size:10px;font-weight:700;}
+.nadd{
+  width:52px;height:52px;
+  background:var(--pg);
+  border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  touch-action:manipulation;
+  box-shadow:0 4px 20px rgba(139,92,246,.5);
+  font-size:26px;color:#fff;
+  transition:transform .15s;
+  flex-shrink:0;
+}
+.nadd:active{transform:scale(.9);}
+
+/* ===== DASHBOARD ===== */
+.hero-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:20px;
+  margin-bottom:14px;
+  position:relative;
+  overflow:hidden;
+}
+.hero-card::after{
+  content:'';
+  position:absolute;
+  top:-40px;right:-40px;
+  width:150px;height:150px;
+  background:radial-gradient(circle,rgba(139,92,246,.15),transparent 70%);
+  border-radius:50%;
+}
+.hero-time{font-size:12px;color:var(--t3);font-weight:600;margin-bottom:6px;}
+.hero-name{font-size:22px;font-weight:900;letter-spacing:-.3px;}
+.hero-sub{font-size:13px;color:var(--t2);margin-top:6px;line-height:1.5;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(139,92,246,.12);
+  border:1px solid rgba(139,92,246,.25);
+  color:var(--p);
+  padding:4px 10px;border-radius:20px;
+  font-size:11px;font-weight:700;
+  margin-top:10px;
+}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:16px;
+}
+.stat-icon{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;margin-bottom:10px;
+}
+.stat-val{font-size:24px;font-weight:900;line-height:1;letter-spacing:-.5px;}
+.stat-label{font-size:11px;color:var(--t2);font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:.4px;}
+.stat-change{font-size:11px;color:var(--t3);margin-top:3px;}
+.s-purple .stat-icon{background:rgba(139,92,246,.12);color:var(--p);}
+.s-green .stat-icon{background:rgba(16,185,129,.12);color:var(--green);}
+.s-yellow .stat-icon{background:rgba(245,158,11,.12);color:var(--yellow);}
+.s-red .stat-icon{background:rgba(239,68,68,.12);color:var(--red);}
+.s-purple .stat-val{color:var(--t1);}
+.s-green .stat-val{color:var(--green);}
+.s-yellow .stat-val{color:var(--yellow);}
+.s-red .stat-val{color:var(--red);}
+
+.section-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.section-title{font-size:12px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;}
+.section-link{font-size:12px;color:var(--p);font-weight:600;cursor:pointer;}
+
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px;}
+.chart-title{font-size:12px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;}
+
+.overdue-card{
+  background:rgba(239,68,68,.06);
+  border:1px solid rgba(239,68,68,.2);
+  border-radius:12px;
+  padding:12px 14px;
+  margin-bottom:8px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;
+}
+.overdue-pulse{width:8px;height:8px;background:var(--red);border-radius:50%;flex-shrink:0;animation:p 1.4s ease infinite;}
+@keyframes p{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+
+/* ===== ORDERS ===== */
+.search-box{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:12px;padding:11px 14px;margin-bottom:12px;
+}
+.search-box input{
+  flex:1;background:none;border:none;outline:none;
+  color:var(--t1);font-size:14px;font-family:inherit;
+}
+.search-box input::placeholder{color:var(--t3);}
+.search-icon{color:var(--t3);font-size:16px;flex-shrink:0;}
+
+.filters{display:flex;gap:8px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px;}
+.filters::-webkit-scrollbar{display:none;}
+.fc{
+  padding:7px 14px;
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:20px;font-size:12px;font-weight:700;
+  color:var(--t2);white-space:nowrap;cursor:pointer;
+  touch-action:manipulation;transition:all .2s;
+  flex-shrink:0;
+}
+.fc.on{background:var(--p);border-color:var(--p);color:#fff;}
+
+.ocard{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:16px;margin-bottom:10px;
+  cursor:pointer;touch-action:manipulation;
+  transition:border-color .2s;
+}
+.ocard:active{border-color:var(--p);}
+.ocard.ov{border-left:3px solid var(--red);}
+.oc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.oc-id{font-size:11px;color:var(--t3);font-weight:600;}
+.oc-name{font-size:16px;font-weight:800;margin-bottom:3px;letter-spacing:-.2px;}
+.oc-meta{font-size:12px;color:var(--t2);}
+.oc-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:10px;padding-top:10px;
+  border-top:1px solid var(--border);
+}
+.oc-prod{font-size:12px;color:var(--t3);max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.oc-price{font-size:15px;font-weight:800;color:var(--green);}
+
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.3px;}
+.bp{background:rgba(245,158,11,.12);color:var(--yellow);}
+.bt{background:rgba(139,92,246,.12);color:var(--p);}
+.bd{background:rgba(16,185,129,.12);color:var(--green);}
+.bc{background:rgba(239,68,68,.12);color:var(--red);}
+
+/* ===== OVERLAY / SHEET ===== */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.8);
+  z-index:200;
+  display:none;
+  align-items:flex-end;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+}
+.overlay.show{display:flex;}
+.sheet{
+  background:var(--surface);
+  border-radius:24px 24px 0 0;
+  width:100%;
+  max-height:93vh;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:0 20px 50px;
+}
+.sh-pill{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 18px;}
+.sh-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.sh-title{font-size:18px;font-weight:900;letter-spacing:-.3px;}
+.sh-close{
+  width:32px;height:32px;background:var(--card);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;color:var(--t2);
+  touch-action:manipulation;
+}
+
+/* FORM */
+.fsec{
+  font-size:10px;font-weight:800;color:var(--p);
+  text-transform:uppercase;letter-spacing:1.2px;
+  margin:20px 0 12px;padding-bottom:8px;
+  border-bottom:1px solid var(--border);
+}
+.fg{margin-bottom:12px;}
+.fl{font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.5px;}
+.fi{
+  width:100%;background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:11px;
+  padding:12px 14px;
+  color:var(--t1);font-size:14px;font-family:inherit;
+  outline:none;transition:border-color .2s;
+  -webkit-appearance:none;
+}
+.fi:focus{border-color:var(--p);}
+select.fi{cursor:pointer;}
+select.fi option{background:var(--card);}
+textarea.fi{resize:none;height:78px;line-height:1.5;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mode-row{display:flex;gap:8px;margin-bottom:16px;}
+.mbt{
+  flex:1;padding:10px;
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:10px;text-align:center;
+  font-size:12px;font-weight:700;color:var(--t2);
+  cursor:pointer;touch-action:manipulation;transition:all .2s;
+}
+.mbt.on{background:rgba(139,92,246,.12);border-color:var(--p);color:var(--p);}
+.calc-box{
+  background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);
+  border-radius:10px;padding:10px 14px;
+  font-size:13px;font-weight:700;color:var(--green);
+  margin-bottom:12px;display:none;
+}
+
+/* BUTTONS */
+.btn{
+  padding:14px 20px;border-radius:12px;
+  font-size:14px;font-weight:800;
+  border:none;cursor:pointer;font-family:inherit;
+  touch-action:manipulation;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--pg);color:#fff;box-shadow:0 4px 16px rgba(139,92,246,.4);}
+.btn-ghost{background:var(--card);color:var(--t1);border:1.5px solid var(--border);}
+.btn-danger{background:rgba(239,68,68,.1);color:var(--red);border:1.5px solid rgba(239,68,68,.2);}
+.btn-full{width:100%;}
+.btn-row{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-top:16px;}
+
+/* PHOTOS */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+.pt{aspect-ratio:1;border-radius:10px;object-fit:cover;width:100%;cursor:pointer;}
+.pa{
+  aspect-ratio:1;border-radius:10px;
+  border:2px dashed var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:22px;color:var(--t3);
+  touch-action:manipulation;
+}
+.pa:active{border-color:var(--p);color:var(--p);}
+.pw{position:relative;}
+.px{
+  position:absolute;top:4px;right:4px;
+  width:20px;height:20px;
+  background:rgba(0,0,0,.85);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;cursor:pointer;color:#fff;
+}
+
+/* DETAIL */
+.d-hero{
+  background:var(--pg);
+  border-radius:var(--r);
+  padding:20px;margin-bottom:14px;
+}
+.d-id{font-size:11px;opacity:.75;font-weight:700;margin-bottom:4px;}
+.d-name{font-size:23px;font-weight:900;letter-spacing:-.3px;margin-bottom:3px;}
+.d-loc{font-size:13px;opacity:.85;}
+.d-actions{display:grid;grid-template-columns:1fr 1fr 44px;gap:8px;margin-bottom:14px;}
+.dsec{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px;}
+.dsec-t{font-size:10px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.dr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);}
+.dr:last-child{border-bottom:none;}
+.dk{font-size:13px;color:var(--t2);}
+.dv{font-size:13px;font-weight:700;text-align:right;max-width:60%;}
+.dv.g{color:var(--green);}
+.dv.y{color:var(--yellow);}
+.dv.r{color:var(--red);}
+.dv.p{color:var(--p);}
+
+/* AI */
+#tAI{overflow:hidden;}
+.ai-msgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;}
+.ai-m{display:flex;gap:10px;margin-bottom:14px;animation:fu .25s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(6px);}to{opacity:1;}}
+.ai-m.u{flex-direction:row-reverse;}
+.ai-av{
+  width:30px;height:30px;border-radius:9px;
+  flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;font-size:13px;
+}
+.ai-m.b .ai-av{background:var(--pg);}
+.ai-m.u .ai-av{background:var(--card);border:1px solid var(--border);}
+.ai-bub{
+  max-width:80%;padding:12px 14px;
+  border-radius:14px;font-size:14px;line-height:1.6;
+}
+.ai-m.u .ai-bub{background:var(--p);color:#fff;border-radius:14px 14px 4px 14px;}
+.ai-m.b .ai-bub{background:var(--card);border:1px solid var(--border);border-radius:14px 14px 14px 4px;}
+.ai-chips{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;flex-shrink:0;}
+.ai-chips::-webkit-scrollbar{display:none;}
+.ach{
+  padding:7px 14px;background:var(--card);
+  border:1px solid var(--border);border-radius:20px;
+  font-size:12px;font-weight:600;color:var(--t2);
+  white-space:nowrap;cursor:pointer;
+  touch-action:manipulation;flex-shrink:0;
+}
+.ach:active{background:rgba(139,92,246,.1);border-color:var(--p);color:var(--p);}
+.ai-bar{
+  display:flex;gap:10px;padding:10px 16px;
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+.ai-inp{
+  flex:1;background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:12px;padding:11px 14px;
+  color:var(--t1);font-size:14px;font-family:inherit;outline:none;
+}
+.ai-inp:focus{border-color:var(--p);}
+.ai-send{
+  width:44px;height:44px;
+  background:var(--pg);border:none;border-radius:12px;
+  color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;flex-shrink:0;
+}
+
+/* SETTINGS */
+.set-item{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:15px 16px;
+  margin-bottom:10px;
+  display:flex;align-items:center;gap:14px;
+  cursor:pointer;touch-action:manipulation;
+  transition:border-color .2s;
+}
+.set-item:active{border-color:var(--p);}
+.set-ic{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  flex-shrink:0;
+}
+.set-info{flex:1;}
+.set-t{font-size:14px;font-weight:700;}
+.set-s{font-size:12px;color:var(--t2);margin-top:2px;}
+.set-arr{font-size:16px;color:var(--t3);}
+.set-sec{font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px 2px;}
+
+/* TANAJI */
+#sTanaji{background:var(--bg);}
+.t-tabs{display:flex;gap:8px;padding:0 16px 12px;flex-shrink:0;}
+.t-tab{
+  flex:1;padding:9px;background:var(--card);
+  border:1.5px solid var(--border);border-radius:10px;
+  text-align:center;font-size:12px;font-weight:700;
+  color:var(--t2);cursor:pointer;touch-action:manipulation;
+  transition:all .2s;
+}
+.t-tab.on{background:rgba(139,92,246,.12);border-color:var(--p);color:var(--p);}
+
+.del-hero{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;margin-bottom:16px;
+}
+
+/* MISC */
+.toast{
+  position:fixed;bottom:calc(var(--nav) + 16px);
+  left:50%;transform:translateX(-50%) translateY(4px);
+  background:var(--card);border:1px solid var(--border2);
+  color:var(--t1);padding:10px 20px;border-radius:20px;
+  font-size:13px;font-weight:600;
+  z-index:999;pointer-events:none;
+  opacity:0;transition:all .25s;white-space:nowrap;
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.offline{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%);
+  background:var(--red);color:#fff;padding:6px 16px;border-radius:20px;
+  font-size:12px;font-weight:700;z-index:999;display:none;
+}
+.offline.show{display:block;}
+.empty{text-align:center;padding:60px 20px;color:var(--t3);}
+.empty div{font-size:44px;margin-bottom:14px;}
+.empty p{font-size:14px;}
+.pv{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:999;display:none;align-items:center;justify-content:center;}
+.pv.show{display:flex;}
+.pv img{max-width:100%;max-height:100%;object-fit:contain;}
+.pv-x{position:absolute;top:20px;right:20px;width:40px;height:40px;background:rgba(255,255,255,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<div class="offline" id="offlinePill">No Internet</div>
+<div class="toast" id="toast"></div>
+
+<!-- ======== LOGIN ======== -->
+<div class="S show" id="sLogin">
+  <div class="login-inner">
+    <div class="brand">
+      <div class="brand-logo">📦</div>
+      <div class="brand-name">Order<em>Pro</em></div>
+      <div class="brand-tag">Business Order Management</div>
+    </div>
+
+    <div class="user-row">
+      <div class="ubtn active" id="ub-a" onclick="selUser('ayush')">
+        <div class="ubtn-emoji">👑</div>
+        <div class="ubtn-name">Ayush</div>
+        <div class="ubtn-role">Owner · Admin</div>
+      </div>
+      <div class="ubtn" id="ub-t" onclick="selUser('tanaji')">
+        <div class="ubtn-emoji">🚚</div>
+        <div class="ubtn-name">Tanaji</div>
+        <div class="ubtn-role">Transport</div>
+      </div>
+    </div>
+
+    <div class="pin-label">Enter 4-digit PIN</div>
+    <div class="pin-dots">
+      <div class="dot" id="d0"></div>
+      <div class="dot" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+    </div>
+    <div class="pad">
+      <div class="key" onclick="kp('1')">1</div>
+      <div class="key" onclick="kp('2')">2</div>
+      <div class="key" onclick="kp('3')">3</div>
+      <div class="key" onclick="kp('4')">4</div>
+      <div class="key" onclick="kp('5')">5</div>
+      <div class="key" onclick="kp('6')">6</div>
+      <div class="key" onclick="kp('7')">7</div>
+      <div class="key" onclick="kp('8')">8</div>
+      <div class="key" onclick="kp('9')">9</div>
+      <div class="key sm" onclick="kp('c')">CLR</div>
+      <div class="key" onclick="kp('0')">0</div>
+      <div class="key" onclick="kp('b')">⌫</div>
+    </div>
+    <div class="pin-err" id="perr"></div>
+  </div>
+</div>
+
+<!-- ======== AYUSH APP ======== -->
+<div class="S" id="sApp">
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="tb-greet" id="greet">Good morning</div>
+      <div class="tb-title" id="ttitle">Dashboard</div>
+    </div>
+    <div class="tb-right">
+      <div class="ib" id="syncBtn" onclick="doSync()">↻</div>
+      <div class="ib" onclick="logout()">⇥</div>
+    </div>
+  </div>
+
+  <div class="content" id="mainContent">
+    <!-- HOME TAB -->
+    <div class="tab-content show" id="tHome">
+      <div class="hero-card" id="heroCard">
+        <div class="hero-time" id="heroTime"></div>
+        <div class="hero-name" id="heroName">Welcome back, Ayush</div>
+        <div class="hero-sub" id="heroSub">Loading your business overview...</div>
+        <div class="hero-badge">📊 Live Dashboard</div>
+      </div>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div id="overdueSection"></div>
+      <div class="chart-card">
+        <div class="chart-title">Orders by Status</div>
+        <canvas id="donutC" height="170"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Profit — Last 8 Orders</div>
+        <canvas id="barC" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div class="tab-content" id="tOrders">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchIn" placeholder="Search name, product, ID..." oninput="renderOrders()">
+      </div>
+      <div class="filters">
+        <div class="fc on" onclick="setFilter('all',this)">All</div>
+        <div class="fc" onclick="setFilter('Pending',this)">⏳ Pending</div>
+        <div class="fc" onclick="setFilter('In Transit',this)">🚚 Transit</div>
+        <div class="fc" onclick="setFilter('Delivered',this)">✅ Delivered</div>
+        <div class="fc" onclick="setFilter('Cancelled',this)">❌ Cancelled</div>
+      </div>
+      <div id="ordersList"></div>
+    </div>
+
+    <!-- AI TAB -->
+    <div class="tab-content" id="tAI">
+      <div class="ai-msgs" id="aiMsgs"></div>
+      <div class="ai-chips">
+        <div class="ach" onclick="aiSend('Total profit this month?')">💰 Monthly profit</div>
+        <div class="ach" onclick="aiSend('Which orders are overdue?')">⚠️ Overdue</div>
+        <div class="ach" onclick="aiSend('Who are my top customers?')">👥 Top customers</div>
+        <div class="ach" onclick="aiSend('Total balance due?')">📊 Balance due</div>
+        <div class="ach" onclick="aiSend('Orders this week?')">📅 This week</div>
+      </div>
+      <div class="ai-bar">
+        <input class="ai-inp" id="aiInp" placeholder="Ask anything about orders..." onkeydown="if(event.key==='Enter')aiSend()">
+        <button class="ai-send" onclick="aiSend()">➤</button>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="tab-content" id="tSettings">
+      <div class="set-sec">Account</div>
+      <div class="set-item" onclick="openOv('ovPin')">
+        <div class="set-ic" style="background:rgba(139,92,246,.1);color:var(--p)">🔒</div>
+        <div class="set-info"><div class="set-t">Change PIN</div><div class="set-s">Update your login PIN</div></div>
+        <div class="set-arr">›</div>
+      </div>
+      <div class="set-sec">Data</div>
+      <div class="set-item" onclick="doSync()">
+        <div class="set-ic" style="background:rgba(16,185,129,.1);color:var(--green)">☁</div>
+        <div class="set-info"><div class="set-t">Sync Now</div><div class="set-s">Pull latest from Google Sheets</div></div>
+        <div class="set-arr">›</div>
+      </div>
+      <div class="set-item" onclick="doExport()">
+        <div class="set-ic" style="background:rgba(245,158,11,.1);color:var(--yellow)">📥</div>
+        <div class="set-info"><div class="set-t">Export CSV</div><div class="set-s">Download all orders</div></div>
+        <div class="set-arr">›</div>
+      </div>
+      <div class="set-sec">AI Assistant</div>
+      <div class="set-item" onclick="openOv('ovAIKey')">
+        <div class="set-ic" style="background:rgba(59,130,246,.1);color:var(--blue)">🤖</div>
+        <div class="set-info"><div class="set-t">Anthropic API Key</div><div class="set-s" id="aiKeyLbl">Not configured</div></div>
+        <div class="set-arr">›</div>
+      </div>
+      <div style="text-align:center;margin-top:32px;color:var(--t3);font-size:12px;line-height:1.8;">
+        <div style="font-weight:800;color:var(--t2)">OrderPro v4.0</div>
+        <div>Google Sheets · Cloudflare Workers</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bnav">
+    <div class="ni on" id="ni-home" onclick="goTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="ni" id="ni-orders" onclick="goTab('orders')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
+      <span>Orders</span>
+    </div>
+    <div class="nadd" onclick="showAdd()">＋</div>
+    <div class="ni" id="ni-ai" onclick="goTab('ai')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      <span>AI</span>
+    </div>
+    <div class="ni" id="ni-settings" onclick="goTab('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span>Settings</span>
+    </div>
+  </div>
+</div>
+
+<!-- ======== TANAJI ======== -->
+<div class="S" id="sTanaji">
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="tb-greet">Transport View</div>
+      <div class="tb-title">My Deliveries</div>
+    </div>
+    <div class="tb-right">
+      <div class="ib" onclick="doSync()">↻</div>
+      <div class="ib" onclick="logout()">⇥</div>
+    </div>
+  </div>
+  <div class="t-tabs">
+    <div class="t-tab on" onclick="tTab('active',this)">Active</div>
+    <div class="t-tab" onclick="tTab('all',this)">All</div>
+    <div class="t-tab" onclick="tTab('Delivered',this)">Done</div>
+  </div>
+  <div class="content" id="tanajiList"></div>
+</div>
+
+<!-- ======== ADD ORDER ======== -->
+<div class="overlay" id="ovAdd">
+  <div class="sheet">
+    <div class="sh-pill"></div>
+    <div class="sh-hd">
+      <div class="sh-title" id="addTitle">New Order</div>
+      <div class="sh-close" onclick="closeOv('ovAdd')">✕</div>
+    </div>
+    <div class="mode-row">
+      <div class="mbt on" id="mb-today" onclick="setMode('today')">📅 Today</div>
+      <div class="mbt" id="mb-past" onclick="setMode('past')">🕐 Past Order</div>
+    </div>
+    <div class="fsec">Customer</div>
+    <div class="fg"><label class="fl">Name *</label><input class="fi" id="f-cn" placeholder="Customer full name"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Phone</label><input class="fi" id="f-ph" type="tel" placeholder="Number"></div>
+      <div class="fg"><label class="fl">Location</label><input class="fi" id="f-loc" placeholder="City / Area"></div>
+    </div>
+    <div class="fsec">Order</div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Order Date</label><input class="fi" id="f-od" type="date"></div>
+      <div class="fg"><label class="fl">Due Date</label><input class="fi" id="f-dd" type="date"></div>
+    </div>
+    <div class="fg"><label class="fl">Status</label>
+      <select class="fi" id="f-st"><option>Pending</option><option>In Transit</option><option>Delivered</option><option>Cancelled</option></select>
+    </div>
+    <div class="fg"><label class="fl">Product Details *</label><textarea class="fi" id="f-pr" placeholder="Describe the product..."></textarea></div>
+    <div class="fsec">Financial</div>
+    <div class="fg"><label class="fl">Distributor / Supplier</label><input class="fi" id="f-di" placeholder="Supplier name"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Buying Price ₹</label><input class="fi" id="f-bp" type="number" placeholder="0" oninput="calcPrev()"></div>
+      <div class="fg"><label class="fl">Selling Price ₹</label><input class="fi" id="f-sp" type="number" placeholder="0" oninput="calcPrev()"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Advance ₹</label><input class="fi" id="f-adv" type="number" placeholder="0" oninput="calcPrev()"></div>
+      <div class="fg"><label class="fl">Payment</label>
+        <select class="fi" id="f-pay"><option>Unpaid</option><option>Partial</option><option>Paid</option></select>
+      </div>
+    </div>
+    <div class="calc-box" id="calcBox"></div>
+    <div class="fsec">Photos</div>
+    <div class="photo-grid" id="pgrid">
+      <div class="pa" onclick="document.getElementById('pIn').click()">📷</div>
+    </div>
+    <input type="file" id="pIn" accept="image/*" multiple style="display:none" onchange="addPhotos(this)">
+    <div class="fsec">Notes</div>
+    <div class="fg"><label class="fl">Remarks</label><textarea class="fi" id="f-rm" placeholder="Any additional notes..."></textarea></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="closeOv('ovAdd')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveOrder()">💾 Save Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== DETAIL ======== -->
+<div class="overlay" id="ovDetail">
+  <div class="sheet" id="detailBody"></div>
+</div>
+
+<!-- ======== DELIVERY ======== -->
+<div class="overlay" id="ovDeliv">
+  <div class="sheet" id="delivBody"></div>
+</div>
+
+<!-- ======== CHANGE PIN ======== -->
+<div class="overlay" id="ovPin">
+  <div class="sheet">
+    <div class="sh-pill"></div>
+    <div class="sh-hd">
+      <div class="sh-title">Change PIN</div>
+      <div class="sh-close" onclick="closeOv('ovPin')">✕</div>
+    </div>
+    <div class="fg"><label class="fl">Current PIN</label><input class="fi" id="pc0" type="password" inputmode="numeric" maxlength="4" placeholder="••••"></div>
+    <div class="fg"><label class="fl">New PIN</label><input class="fi" id="pc1" type="password" inputmode="numeric" maxlength="4" placeholder="••••"></div>
+    <div class="fg"><label class="fl">Confirm PIN</label><input class="fi" id="pc2" type="password" inputmode="numeric" maxlength="4" placeholder="••••"></div>
+    <div class="pin-err" id="pcErr"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="closeOv('ovPin')">Cancel</button>
+      <button class="btn btn-primary" onclick="changePIN()">Update PIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== AI KEY ======== -->
+<div class="overlay" id="ovAIKey">
+  <div class="sheet">
+    <div class="sh-pill"></div>
+    <div class="sh-hd">
+      <div class="sh-title">AI API Key</div>
+      <div class="sh-close" onclick="closeOv('ovAIKey')">✕</div>
+    </div>
+    <div class="fg"><label class="fl">Anthropic API Key</label><input class="fi" id="aiKeyIn" type="password" placeholder="sk-ant-..."></div>
+    <p style="font-size:12px;color:var(--t2);margin-bottom:16px;line-height:1.6">Get your free key from <strong>console.anthropic.com</strong>. Stored only on this device.</p>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="closeOv('ovAIKey')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAIKey()">Save Key</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== PHOTO VIEWER ======== -->
+<div class="pv" id="pvWrap">
+  <img id="pvImg" src="">
+  <div class="pv-x" onclick="closePV()">✕</div>
+</div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// CONFIG
+// ━━━━━━━━━━━━━━━━━━━━━━━
+const GAS = 'https://script.google.com/macros/s/AKfycbxR123yDBLFS_cXVBETlMd-a-s_VEF2MyvCJyWZPKgYAKZPR42VvbfBaWlG-mkKHocZ/exec';
+const CF  = 'https://rough-bush-a4eb.aarde2282.workers.dev/?url=';
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// STATE
+// ━━━━━━━━━━━━━━━━━━━━━━━
+let WHO = null, ORDERS = [], PHOTOS = [], EDIT_ID = null, MODE = 'today';
+let FILTER = 'all', T_FILTER = 'active', AI_HIST = [];
+let DONUT = null, BAR = null;
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// LOCAL STORAGE
+// ━━━━━━━━━━━━━━━━━━━━━━━
+const store = {
+  get:()=>{ try{return JSON.parse(localStorage.getItem('op4')||'[]')}catch{return[]} },
+  set:(d)=>{ try{localStorage.setItem('op4',JSON.stringify(d))}catch{} },
+  pins:()=>{ try{return JSON.parse(localStorage.getItem('op4pins')||'{"a":"1234","t":"5678"}')}catch{return{a:'1234',t:'5678'}} },
+  setPins:(p)=>localStorage.setItem('op4pins',JSON.stringify(p)),
+  key:()=>localStorage.getItem('op4key')||'',
+  setKey:(k)=>localStorage.setItem('op4key',k),
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// API
+// ━━━━━━━━━━━━━━━━━━━━━━━
+async function api(params){
+  const url = CF + encodeURIComponent(GAS + '?' + new URLSearchParams(params));
+  const r = await fetch(url);
+  return JSON.parse(await r.text());
+}
+
+async function doSync(silent=false){
+  const btn = document.getElementById('syncBtn');
+  if(btn) btn.classList.add('syncing');
+  if(!silent) toast('Syncing...');
+  try {
+    const res = await api({action:'getOrders'});
+    if(res.success){ ORDERS=res.orders||[]; store.set(ORDERS); renderAll(); if(!silent) toast('✓ Synced'); }
+    else throw 0;
+  } catch { ORDERS=store.get(); renderAll(); if(!silent) toast('Using local data'); }
+  finally { if(btn) btn.classList.remove('syncing'); }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// LOGIN
+// ━━━━━━━━━━━━━━━━━━━━━━━
+let PIN = '';
+function selUser(u){
+  WHO = u;
+  document.getElementById('ub-a').className = 'ubtn' + (u==='ayush'?' active':'');
+  document.getElementById('ub-t').className = 'ubtn' + (u==='tanaji'?' active':'');
+  PIN=''; dots(); document.getElementById('perr').textContent='';
+}
+function kp(v){
+  if(v==='c'){PIN='';dots();return;}
+  if(v==='b'){PIN=PIN.slice(0,-1);dots();return;}
+  if(PIN.length>=4)return;
+  PIN+=v; dots();
+  if(PIN.length===4) verify();
+}
+function dots(){ for(let i=0;i<4;i++) document.getElementById('d'+i).className='dot'+(i<PIN.length?' fill':''); }
+function verify(){
+  const p=store.pins(), ok=WHO==='ayush'?p.a:p.t;
+  if(PIN===ok){
+    document.getElementById('perr').textContent='';
+    ORDERS=store.get();
+    if(WHO==='ayush'){ showS('sApp'); setGreet(); checkAIKey(); }
+    else showS('sTanaji');
+    doSync(true);
+  } else {
+    document.getElementById('perr').textContent='Incorrect PIN. Try again.';
+    PIN=''; dots();
+  }
+}
+function logout(){ PIN=''; WHO=null; showS('sLogin'); }
+function setGreet(){
+  const h=new Date().getHours();
+  const g=h<12?'Good morning ☀️':h<17?'Good afternoon 🌤':h<21?'Good evening 🌆':'Good night 🌙';
+  document.getElementById('greet').textContent=g;
+  const now=new Date();
+  document.getElementById('heroTime').textContent=now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// SCREENS
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function showS(id){
+  document.querySelectorAll('.S').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// TABS
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function goTab(t){
+  ['home','orders','ai','settings'].forEach(x=>{
+    document.getElementById('t'+x.charAt(0).toUpperCase()+x.slice(1)).classList.remove('show');
+    document.getElementById('ni-'+x)?.classList.remove('on');
+  });
+  document.getElementById('t'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('show');
+  document.getElementById('ni-'+t)?.classList.add('on');
+  const titles={home:'Dashboard',orders:'Orders',ai:'AI Assistant',settings:'Settings'};
+  document.getElementById('ttitle').textContent=titles[t];
+  if(t==='home') renderDash();
+  if(t==='orders') renderOrders();
+  if(t==='ai' && !document.getElementById('aiMsgs').children.length) aiWelcome();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// RENDER ALL
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function renderAll(){
+  if(WHO==='ayush'){renderDash();renderOrders();}
+  if(WHO==='tanaji') renderTanaji();
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// DASHBOARD
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function renderDash(){
+  const total=ORDERS.length;
+  const profit=ORDERS.reduce((s,o)=>s+(+o.profit||0),0);
+  const balance=ORDERS.filter(o=>o.status!=='Cancelled').reduce((s,o)=>s+(+o.balance||0),0);
+  const ov=ORDERS.filter(isOv);
+  const mn=new Date(), mOrders=ORDERS.filter(o=>{ const d=new Date(o.order_date); return d.getMonth()===mn.getMonth()&&d.getFullYear()===mn.getFullYear(); });
+
+  document.getElementById('heroSub').textContent=`${total} total orders · ₹${fK(profit)} profit · ${ov.length} overdue`;
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stat s-purple">
+      <div class="stat-icon">📦</div>
+      <div class="stat-val">${total}</div>
+      <div class="stat-label">Total Orders</div>
+      <div class="stat-change">${mOrders.length} this month</div>
+    </div>
+    <div class="stat s-green">
+      <div class="stat-icon">💰</div>
+      <div class="stat-val">₹${fK(profit)}</div>
+      <div class="stat-label">Total Profit</div>
+      <div class="stat-change">Net earnings</div>
+    </div>
+    <div class="stat s-yellow">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-val">₹${fK(balance)}</div>
+      <div class="stat-label">Balance Due</div>
+      <div class="stat-change">Pending payment</div>
+    </div>
+    <div class="stat s-red">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-val">${ov.length}</div>
+      <div class="stat-label">Overdue</div>
+      <div class="stat-change">Need attention</div>
+    </div>
+  `;
+
+  const sec=document.getElementById('overdueSection');
+  if(ov.length){
+    sec.innerHTML=`<div class="section-hd"><span class="section-title">⚠️ Overdue Orders</span><span class="section-link" onclick="goTab('orders')">View all</span></div>`+
+      ov.slice(0,3).map(o=>`<div class="overdue-card" onclick="showDetail('${o.order_id}')">
+        <div class="overdue-pulse"></div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700">${o.cust_name}</div><div style="font-size:12px;color:var(--t2)">Due: ${o.due_date} · ${o.status}</div></div>
+        <div style="font-size:14px;color:var(--t3)">›</div>
+      </div>`).join('');
+  } else sec.innerHTML='';
+
+  // Charts
+  const counts={'Pending':0,'In Transit':0,'Delivered':0,'Cancelled':0};
+  ORDERS.forEach(o=>{ if(counts[o.status]!==undefined) counts[o.status]++; });
+  if(DONUT) DONUT.destroy();
+  DONUT=new Chart(document.getElementById('donutC').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:Object.keys(counts),datasets:[{data:Object.values(counts),backgroundColor:['#f59e0b','#8b5cf6','#10b981','#ef4444'],borderWidth:0,hoverOffset:4}]},
+    options:{plugins:{legend:{position:'right',labels:{color:'#a1a1aa',font:{family:'Inter',size:11},padding:10}}},cutout:'70%'}
+  });
+
+  const last8=[...ORDERS].sort((a,b)=>new Date(b.order_date)-new Date(a.order_date)).slice(0,8).reverse();
+  if(BAR) BAR.destroy();
+  BAR=new Chart(document.getElementById('barC').getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:last8.map(o=>(o.cust_name||'').split(' ')[0]),
+      datasets:[{data:last8.map(o=>+o.profit||0),backgroundColor:'rgba(139,92,246,0.75)',borderRadius:8,borderSkipped:false}]
+    },
+    options:{plugins:{legend:{display:false}},scales:{
+      x:{ticks:{color:'#52525b',font:{size:10}},grid:{display:false}},
+      y:{ticks:{color:'#52525b',font:{size:10}},grid:{color:'rgba(39,39,42,0.8)'},border:{dash:[4,4]}}
+    }}
+  });
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// ORDERS LIST
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function setFilter(f,el){ FILTER=f; document.querySelectorAll('.fc').forEach(x=>x.classList.remove('on')); el.classList.add('on'); renderOrders(); }
+function renderOrders(){
+  const q=(document.getElementById('searchIn')?.value||'').toLowerCase();
+  let list=ORDERS.filter(o=>{
+    const mf=FILTER==='all'||o.status===FILTER;
+    const ms=!q||[o.cust_name,o.product,o.order_id,o.cust_location].some(v=>(v||'').toLowerCase().includes(q));
+    return mf&&ms;
+  }).sort((a,b)=>new Date(b.order_date||0)-new Date(a.order_date||0));
+  const el=document.getElementById('ordersList');
+  if(!list.length){el.innerHTML='<div class="empty"><div>📭</div><p>No orders found</p></div>';return;}
+  el.innerHTML=list.map(oCard).join('');
+}
+function oCard(o){
+  return `<div class="ocard${isOv(o)?' ov':''}" onclick="showDetail('${o.order_id}')">
+    <div class="oc-top"><div class="oc-id">${o.order_id||''} · ${o.order_date||''}</div><div class="badge ${bClass(o.status)}">${o.status}</div></div>
+    <div class="oc-name">${o.cust_name||'—'}</div>
+    <div class="oc-meta">${[o.cust_location,o.due_date?'Due '+o.due_date:''].filter(Boolean).join(' · ')}</div>
+    <div class="oc-foot"><div class="oc-prod">${o.product||'—'}</div><div class="oc-price">₹${fN(o.sell_price||0)}</div></div>
+  </div>`;
+}
+function bClass(s){ return s==='Pending'?'bp':s==='In Transit'?'bt':s==='Delivered'?'bd':'bc'; }
+function isOv(o){ return o.due_date&&o.status!=='Delivered'&&o.status!=='Cancelled'&&new Date(o.due_date)<new Date(); }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// ADD ORDER
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function showAdd(){
+  EDIT_ID=null; PHOTOS=[];
+  ['f-cn','f-ph','f-loc','f-od','f-dd','f-pr','f-di','f-bp','f-sp','f-adv','f-rm'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('f-st').value='Pending';
+  document.getElementById('f-pay').value='Unpaid';
+  document.getElementById('calcBox').style.display='none';
+  document.getElementById('addTitle').textContent='New Order';
+  setMode('today'); updPGrid(); openOv('ovAdd');
+}
+function setMode(m){
+  MODE=m;
+  document.getElementById('mb-today').className='mbt'+(m==='today'?' on':'');
+  document.getElementById('mb-past').className='mbt'+(m==='past'?' on':'');
+  const el=document.getElementById('f-od');
+  if(m==='today'){ el.value=new Date().toISOString().split('T')[0]; el.readOnly=true; }
+  else { el.value=''; el.readOnly=false; }
+}
+function calcPrev(){
+  const s=+document.getElementById('f-sp').value||0, b=+document.getElementById('f-bp').value||0, a=+document.getElementById('f-adv').value||0;
+  const box=document.getElementById('calcBox');
+  if(s>0){ box.style.display='block'; box.textContent=`Profit: ₹${fN(s-b)}  ·  Balance: ₹${fN(s-a)}`; }
+  else box.style.display='none';
+}
+function addPhotos(inp){
+  [...inp.files].forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const c=document.createElement('canvas');
+        let w=img.width,h=img.height,mx=800;
+        if(w>mx||h>mx){ if(w>h){h=h*mx/w;w=mx;}else{w=w*mx/h;h=mx;} }
+        c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+        PHOTOS.push(c.toDataURL('image/jpeg',.65));
+        updPGrid();
+      };
+      img.src=e.target.result;
+    };
+    r.readAsDataURL(f);
+  });
+}
+function removePhoto(i){ PHOTOS.splice(i,1); updPGrid(); }
+function updPGrid(){
+  document.getElementById('pgrid').innerHTML=
+    PHOTOS.map((p,i)=>`<div class="pw"><img class="pt" src="${p}" onclick="viewPhoto('${p}')"><div class="px" onclick="removePhoto(${i})">✕</div></div>`).join('')+
+    '<div class="pa" onclick="document.getElementById(\'pIn\').click()">📷</div>';
+}
+async function saveOrder(){
+  const name=document.getElementById('f-cn').value.trim();
+  if(!name){ toast('Customer name required'); return; }
+  const sp=+document.getElementById('f-sp').value||0, bp=+document.getElementById('f-bp').value||0, adv=+document.getElementById('f-adv').value||0;
+  const o={
+    order_id:EDIT_ID||'ORD-'+Date.now(),
+    order_date:document.getElementById('f-od').value,
+    due_date:document.getElementById('f-dd').value,
+    status:document.getElementById('f-st').value,
+    cust_name:name,
+    cust_phone:document.getElementById('f-ph').value,
+    cust_location:document.getElementById('f-loc').value,
+    product:document.getElementById('f-pr').value,
+    dist_name:document.getElementById('f-di').value,
+    buy_price:bp,sell_price:sp,advance:adv,
+    balance:sp-adv,profit:sp-bp,
+    pay_status:document.getElementById('f-pay').value,
+    remarks:document.getElementById('f-rm').value,
+    photos:PHOTOS,
+    created_at:EDIT_ID?(ORDERS.find(x=>x.order_id===EDIT_ID)||{}).created_at||new Date().toISOString():new Date().toISOString(),
+  };
+  if(EDIT_ID){ const i=ORDERS.findIndex(x=>x.order_id===EDIT_ID); if(i>=0) ORDERS[i]={...ORDERS[i],...o}; }
+  else ORDERS.unshift(o);
+  store.set(ORDERS); closeOv('ovAdd'); renderAll(); toast('Saving...');
+  try{ const res=await api({action:EDIT_ID?'updateOrder':'saveOrder',data:JSON.stringify(o)}); toast(res.success?'✓ Saved to Google Sheets':'Saved locally'); }
+  catch{ toast('Saved locally'); }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// ORDER DETAIL
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function showDetail(id){
+  const o=ORDERS.find(x=>x.order_id===id); if(!o) return;
+  const isA=WHO==='ayush';
+  const pics=Array.isArray(o.photos)?o.photos:(o.photos?tryJ(o.photos):[]);
+  document.getElementById('detailBody').innerHTML=`
+    <div class="sh-pill"></div>
+    <div class="d-hero">
+      <div class="d-id">${o.order_id}</div>
+      <div class="d-name">${o.cust_name}</div>
+      <div class="d-loc">${[o.cust_location,o.cust_phone].filter(Boolean).join(' · ')}</div>
+    </div>
+    <div class="d-actions">
+      ${isA?`<button class="btn btn-ghost" onclick="editOrder('${id}')">✏️ Edit</button>`:'<div></div>'}
+      <button class="btn btn-ghost" onclick="shareWA('${id}')">📱 WhatsApp</button>
+      ${isA?`<button class="btn btn-danger" onclick="delOrder('${id}')">🗑</button>`:''}
+    </div>
+    <div class="dsec"><div class="dsec-t">Order Info</div>
+      ${dRow('Status',`<span class="badge ${bClass(o.status)}">${o.status}</span>`)}
+      ${dRow('Order Date',o.order_date||'—')}${dRow('Due Date',o.due_date||'—')}
+      ${dRow('Product',o.product||'—')}${dRow('Supplier',o.dist_name||'—')}
+    </div>
+    ${isA?`<div class="dsec"><div class="dsec-t">Financial</div>
+      ${dRow('Selling Price','₹'+fN(o.sell_price||0))}
+      ${dRow('Buying Price','₹'+fN(o.buy_price||0))}
+      ${dRow('Advance','₹'+fN(o.advance||0))}
+      ${dRow('Balance Due','<span class="dv y">₹'+fN(o.balance||0)+'</span>')}
+      ${dRow('Profit','<span class="dv g">₹'+fN(o.profit||0)+'</span>')}
+      ${o.net_profit?dRow('Net Profit','<span class="dv g">₹'+fN(o.net_profit)+'</span>'):''}
+      ${dRow('Payment',o.pay_status||'—')}
+    </div>`:''}
+    <div class="dsec"><div class="dsec-t">Delivery</div>
+      ${dRow('Delivery Date',o.deliv_date||'—')}
+      ${dRow('Driver',o.driver_name||'—')}
+      ${dRow('Driver Phone',o.driver_phone||'—')}
+      ${dRow('Delivery Exp',o.delivery_expense?'₹'+fN(o.delivery_expense):'—')}
+      ${dRow('Notes',o.experience||'—')}
+      ${!isA?`<button class="btn btn-primary btn-full" style="margin-top:12px" onclick="closeOv('ovDetail');showDeliv('${id}')">📝 Fill Delivery Details</button>`:''}
+    </div>
+    ${pics.length?`<div class="dsec"><div class="dsec-t">Photos (${pics.length})</div><div class="photo-grid">${pics.map(p=>`<img class="pt" src="${p}" onclick="viewPhoto('${p}')">`).join('')}</div></div>`:''}
+    ${o.remarks?`<div class="dsec"><div class="dsec-t">Remarks</div><div style="font-size:13px;line-height:1.6;color:var(--t2)">${o.remarks}</div></div>`:''}
+  `;
+  openOv('ovDetail');
+}
+function dRow(k,v){ return `<div class="dr"><span class="dk">${k}</span><span class="dv">${v}</span></div>`; }
+function tryJ(s){ try{return JSON.parse(s)}catch{return[]} }
+
+function editOrder(id){
+  const o=ORDERS.find(x=>x.order_id===id); if(!o) return;
+  closeOv('ovDetail'); EDIT_ID=id;
+  PHOTOS=Array.isArray(o.photos)?[...o.photos]:tryJ(o.photos||'[]');
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.value=v||''; };
+  set('f-cn',o.cust_name);set('f-ph',o.cust_phone);set('f-loc',o.cust_location);
+  set('f-pr',o.product);set('f-di',o.dist_name);set('f-bp',o.buy_price);
+  set('f-sp',o.sell_price);set('f-adv',o.advance);set('f-rm',o.remarks);
+  set('f-od',o.order_date);set('f-dd',o.due_date);
+  document.getElementById('f-st').value=o.status||'Pending';
+  document.getElementById('f-pay').value=o.pay_status||'Unpaid';
+  document.getElementById('f-od').readOnly=false;
+  document.getElementById('addTitle').textContent='Edit Order';
+  document.getElementById('mb-today').className='mbt';
+  document.getElementById('mb-past').className='mbt on';
+  calcPrev(); updPGrid(); openOv('ovAdd');
+}
+async function delOrder(id){
+  if(!confirm('Delete this order?')) return;
+  ORDERS=ORDERS.filter(o=>o.order_id!==id);
+  store.set(ORDERS); closeOv('ovDetail'); renderAll(); toast('Deleting...');
+  try{ await api({action:'deleteOrder',orderId:id}); toast('✓ Deleted'); }catch{ toast('Deleted locally'); }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// DELIVERY (TANAJI)
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function showDeliv(id){
+  const o=ORDERS.find(x=>x.order_id===id); if(!o) return;
+  document.getElementById('delivBody').innerHTML=`
+    <div class="sh-pill"></div>
+    <div class="sh-hd"><div class="sh-title">Delivery Details</div><div class="sh-close" onclick="closeOv('ovDeliv')">✕</div></div>
+    <div class="del-hero">
+      <div style="font-size:11px;color:var(--t3);font-weight:700;margin-bottom:4px">${o.order_id}</div>
+      <div style="font-size:17px;font-weight:800">${o.cust_name}</div>
+      <div style="font-size:13px;color:var(--t2);margin-top:3px">${o.product?.substring(0,60)||''}</div>
+      ${o.cust_phone?`<div style="font-size:13px;color:var(--p);font-weight:700;margin-top:6px">📞 ${o.cust_phone}</div>`:''}
+    </div>
+    <div class="fg"><label class="fl">Delivery Date</label><input class="fi" id="d-dt" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+    <div class="fg"><label class="fl">Driver Name</label><input class="fi" id="d-dn" placeholder="Driver name" value="${o.driver_name||''}"></div>
+    <div class="fg"><label class="fl">Driver Phone</label><input class="fi" id="d-dp" type="tel" placeholder="Driver phone" value="${o.driver_phone||''}"></div>
+    <div class="fg"><label class="fl">Delivery Expenses ₹</label><input class="fi" id="d-ex" type="number" placeholder="0" value="${o.delivery_expense||''}" oninput="prevNet(${+o.profit||0})"></div>
+    <div id="netPrev" style="display:none;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;color:var(--green);margin-bottom:12px;"></div>
+    <div class="fg"><label class="fl">Status</label><select class="fi" id="d-st"><option ${o.status==='In Transit'?'selected':''}>In Transit</option><option ${o.status==='Delivered'?'selected':''}>Delivered</option></select></div>
+    <div class="fg"><label class="fl">Notes / Experience</label><textarea class="fi" id="d-nt" placeholder="How was the delivery?">${o.experience||''}</textarea></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="closeOv('ovDeliv')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDeliv('${id}')">✓ Save Delivery</button>
+    </div>
+  `;
+  openOv('ovDeliv');
+}
+function prevNet(profit){ const ex=+document.getElementById('d-ex').value||0; const el=document.getElementById('netPrev'); el.style.display='block'; el.textContent='Net Profit after delivery: ₹'+fN(profit-ex); }
+async function saveDeliv(id){
+  const o=ORDERS.find(x=>x.order_id===id); if(!o) return;
+  o.deliv_date=document.getElementById('d-dt').value;
+  o.driver_name=document.getElementById('d-dn').value;
+  o.driver_phone=document.getElementById('d-dp').value;
+  o.delivery_expense=document.getElementById('d-ex').value||0;
+  o.experience=document.getElementById('d-nt').value;
+  o.status=document.getElementById('d-st').value;
+  o.net_profit=(+o.profit||0)-(+o.delivery_expense||0);
+  store.set(ORDERS); closeOv('ovDeliv'); renderTanaji(); toast('Saving...');
+  try{ await api({action:'updateOrder',data:JSON.stringify(o)}); toast('✓ Delivery saved'); }catch{ toast('Saved locally'); }
+}
+function tTab(f,el){ T_FILTER=f; document.querySelectorAll('.t-tab').forEach(x=>x.classList.remove('on')); el.classList.add('on'); renderTanaji(); }
+function renderTanaji(){
+  let list;
+  if(T_FILTER==='active') list=ORDERS.filter(o=>o.status==='Pending'||o.status==='In Transit');
+  else if(T_FILTER==='all') list=[...ORDERS];
+  else list=ORDERS.filter(o=>o.status===T_FILTER);
+  list.sort((a,b)=>new Date(b.order_date||0)-new Date(a.order_date||0));
+  const el=document.getElementById('tanajiList');
+  if(!list.length){el.innerHTML='<div class="empty"><div>🚚</div><p>No orders</p></div>';return;}
+  el.innerHTML=list.map(o=>`
+    <div class="ocard${isOv(o)?' ov':''}" onclick="showDetail('${o.order_id}')">
+      <div class="oc-top"><div class="oc-id">${o.order_id} · ${o.order_date||''}</div><div class="badge ${bClass(o.status)}">${o.status}</div></div>
+      <div class="oc-name">${o.cust_name}</div>
+      <div class="oc-meta">${[o.cust_location,o.due_date?'Due '+o.due_date:''].filter(Boolean).join(' · ')}</div>
+      <div style="font-size:12px;color:var(--t3);margin-top:6px">${(o.product||'').substring(0,55)}</div>
+      ${!o.deliv_date
+        ?`<button class="btn btn-primary btn-full" style="margin-top:12px;padding:11px" onclick="event.stopPropagation();showDeliv('${o.order_id}')">📝 Fill Delivery</button>`
+        :`<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:8px">✅ Delivered ${o.deliv_date}</div>`}
+    </div>`).join('');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// WHATSAPP
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function shareWA(id){
+  const o=ORDERS.find(x=>x.order_id===id); if(!o) return;
+  const msg=`📦 *${o.order_id}*\n👤 *${o.cust_name}*\n📍 ${o.cust_location||'—'}\n📞 ${o.cust_phone||'—'}\n\n🛍 ${o.product||'—'}\n📅 Order: ${o.order_date||'—'}\n⏰ Due: ${o.due_date||'—'}\n📊 Status: ${o.status}\n💰 Amount: ₹${fN(o.sell_price||0)}\n💵 Balance: ₹${fN(o.balance||0)}`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg));
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// AI
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function aiWelcome(){ addAI(`Hi Ayush! 👋 I'm your business AI.\n\nI can see all your orders. Ask me anything — profit analysis, overdue orders, customer insights, and more!`,'b'); }
+async function aiSend(q){
+  const inp=document.getElementById('aiInp');
+  const msg=q||inp.value.trim(); if(!msg) return;
+  inp.value=''; addAI(msg,'u'); AI_HIST.push({role:'user',content:msg});
+  const thinking=addAI('Thinking...','b');
+  const key=store.key();
+  if(!key){ thinking.textContent='Please add your Anthropic API key in Settings → AI API Key.'; return; }
+  const ctx=`You are a business AI for Ayush's order management. ${ORDERS.length} orders total. Profit: ₹${ORDERS.reduce((s,o)=>s+(+o.profit||0),0)}. Orders: ${JSON.stringify(ORDERS.slice(0,12).map(o=>({id:o.order_id,customer:o.cust_name,status:o.status,date:o.order_date,due:o.due_date,sell:o.sell_price,profit:o.profit,balance:o.balance})))}. Be concise, use ₹.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:ctx,messages:AI_HIST.slice(-10)})
+    });
+    const d=await r.json();
+    const reply=d.content?.[0]?.text||'No response.';
+    thinking.innerHTML=reply.replace(/\n/g,'<br>');
+    AI_HIST.push({role:'assistant',content:reply});
+  }catch{ thinking.textContent='AI error. Check your API key in Settings.'; }
+}
+function addAI(text,role){
+  const div=document.createElement('div');
+  div.className='ai-m '+role;
+  div.innerHTML=`<div class="ai-av">${role==='b'?'🤖':'👤'}</div><div class="ai-bub">${text.replace(/\n/g,'<br>')}</div>`;
+  document.getElementById('aiMsgs').appendChild(div);
+  document.getElementById('aiMsgs').scrollTop=99999;
+  return div.querySelector('.ai-bub');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// SETTINGS
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function changePIN(){
+  const p=store.pins(),cur=document.getElementById('pc0').value,nw=document.getElementById('pc1').value,cn=document.getElementById('pc2').value;
+  const ok=WHO==='ayush'?p.a:p.t,err=document.getElementById('pcErr');
+  if(cur!==ok){err.textContent='Current PIN wrong';return;}
+  if(nw.length!==4||!/^\d{4}$/.test(nw)){err.textContent='PIN must be 4 digits';return;}
+  if(nw!==cn){err.textContent='PINs do not match';return;}
+  if(WHO==='ayush')p.a=nw;else p.t=nw;
+  store.setPins(p);closeOv('ovPin');toast('✓ PIN updated');err.textContent='';
+}
+function saveAIKey(){ const k=document.getElementById('aiKeyIn').value.trim(); if(!k){toast('Enter a key');return;} store.setKey(k);closeOv('ovAIKey');checkAIKey();toast('✓ AI key saved'); }
+function checkAIKey(){ const el=document.getElementById('aiKeyLbl'); if(el) el.textContent=store.key()?'Configured ✓':'Not configured'; }
+function doExport(){
+  if(!ORDERS.length){toast('No orders');return;}
+  const k=['order_id','order_date','due_date','status','cust_name','cust_phone','cust_location','product','dist_name','buy_price','sell_price','advance','balance','profit','delivery_expense','net_profit','pay_status','deliv_date','driver_name','remarks'];
+  const csv=[k.join(','),...ORDERS.map(o=>k.map(x=>`"${(o[x]||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='orders.csv';a.click();toast('✓ Downloaded');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// OVERLAYS
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function openOv(id){ document.getElementById(id).classList.add('show'); }
+function closeOv(id){ document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('show'); }));
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// PHOTO VIEWER
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function viewPhoto(src){ document.getElementById('pvImg').src=src; document.getElementById('pvWrap').classList.add('show'); }
+function closePV(){ document.getElementById('pvWrap').classList.remove('show'); }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// UTILS
+// ━━━━━━━━━━━━━━━━━━━━━━━
+function fN(n){ return Number(n).toLocaleString('en-IN'); }
+function fK(n){ return n>=100000?(n/100000).toFixed(1)+'L':n>=1000?(n/1000).toFixed(1)+'K':fN(n); }
+function toast(msg,d=2500){ const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d); }
+window.addEventListener('offline',()=>document.getElementById('offlinePill').classList.add('show'));
+window.addEventListener('online',()=>{ document.getElementById('offlinePill').classList.remove('show');doSync(true); });
+
+// ━━━━━━━━━━━━━━━━━━━━━━━
+// INIT
+// ━━━━━━━━━━━━━━━━━━━━━━━
+ORDERS = store.get();
+selUser('ayush');
+</script>
+</body>
+</html>
